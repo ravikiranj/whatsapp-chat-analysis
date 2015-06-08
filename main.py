@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import codecs
 import datelib
@@ -5,6 +7,7 @@ import re
 import operator
 import sys
 import json
+from dateutil.parser import parse
 
 
 class Chat():
@@ -55,9 +58,8 @@ class Chat():
         counter = dict()
         for i in range(len(self.datelist)):
             try:
-                day, month, year = self.datelist[i].split("/")
-                parsed_date = "%s-%s-%s" % (year, month, day)
-                weekday = date.date_to_weekday(parsed_date)
+                parsed_date = parse(self.datelist[i] + "," + self.timelist[i])
+                weekday = parsed_date.strftime("%A")
                 if weekday not in counter:
                     counter[weekday] = 1
                 else:
@@ -102,14 +104,17 @@ class Chat():
             pattern_dict[pattern] = re.compile(re.escape(pattern), re.I)
         for i in range(len(self.messagelist)):
             for pattern in patternlist:
-                search_result = pattern_dict[pattern].\
-                    findall(self.messagelist[i])
-                length = len(search_result)
-                if length > 0:
-                    if pattern not in counters:
-                        counters[pattern][self.senderlist[i]] = length
-                    else:
-                        counters[pattern][self.senderlist[i]] += length
+                try:
+                    search_result = pattern_dict[pattern].\
+                        findall(self.messagelist[i])
+                    length = len(search_result)
+                    if length > 0:
+                        if pattern not in counters:
+                            counters[pattern][self.senderlist[i]] = length
+                        else:
+                            counters[pattern][self.senderlist[i]] += length
+                except:
+                    pass
         return counters
 
     def print_patterns_dict(self, pattern_dict):
@@ -205,7 +210,7 @@ def main():
     output["weekdays"] = c.count_messages_per_weekday()
     printDict(output["weekdays"], "weekday", 0)
 
-    print "\n--AVERAGE MESSAGE LENGTH"
+    print "\n--AVERAGE MESSAGE LENGTH (NO. OF WORDS)"
     output["lengths"] = c.average_message_length()
     printDict(output["lengths"], "lengths", 0)
 
