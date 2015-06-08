@@ -218,8 +218,9 @@ def main():
     output["patterns"] = c.count_messages_pattern(sys.argv[2:])
     printDict(output["patterns"], "patterns", 0)
 
-    print "\n--TOP 15 MOST USED WORDS (length >= 3)"
-    output["most_used_words"] = c.most_used_words(top=15, threshold=3)
+    top_words_list_len = 30
+    print "\n--TOP %d MOST USED WORDS (length >= 3)" % (top_words_list_len)
+    output["most_used_words"] = c.most_used_words(top=top_words_list_len, threshold=3)
     output["most_used_words"] = sorted(output["most_used_words"], key=operator.itemgetter(1), reverse=True)
     #print output["most_used_words"]
     for muw in output["most_used_words"]:
